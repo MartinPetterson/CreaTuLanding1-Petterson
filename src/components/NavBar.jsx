@@ -1,34 +1,54 @@
-import { Flex, Menu, MenuButton, MenuItem, MenuList ,Button} from "@chakra-ui/react";
+import {
+  Flex,
+  Text,
+  MenuButton,
+  Menu,
+  MenuList,
+  Button,
+  MenuItem,
+} from "@chakra-ui/react";
 import CartWidget from "./CartWidget";
-
-const MyStyle = {
-    displey: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#272b45",
-    padding: "20px",
-    width: "100vw", 
-    height: "4rem",
-}
+import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { getAllCategories } from "../services/products.service";
 
 const NavBar = () => {
-    return <Flex style={MyStyle}>
+  const [categories, setCategories] = useState([]);
+  const navigate = useNavigate();
 
-<Menu>
-  <MenuButton as={Button} style={{backgroundColor:"#ffd700", color:"black"}}>
-    Menu
-  </MenuButton>
-  <MenuList>
-    <MenuItem>Menu1</MenuItem>
-    <MenuItem>Menu2</MenuItem>
-    <MenuItem>Menu3</MenuItem>
-    <MenuItem>Menu4</MenuItem>
-    <MenuItem>Menu5</MenuItem>
-  </MenuList>
-</Menu>
-        <h1 style={{color:"#ffd700"}}> TStore </h1>
-        <div style={{color:"#ffd700"}}> <CartWidget /> </div>
+  useEffect(() => {
+    getAllCategories()
+      .then((res) => setCategories(res.data))
+      .catch((error) => console.error(error));
+  }, []);
+
+   return (
+    <Flex
+      alignItems="center"
+      justifyContent="space-between"
+      width="100%"
+      padding="0 20px"
+      height="7vh"
+      border="1px solid #2e2e2e"
+      bgColor={"#646cff"}
+    >
+      <Text className="navbar-title" onClick={() => navigate("/")} cursor="pointer" fontSize="xl" color="#ffd700">
+        T'Store
+      </Text>
+      <Menu>
+        <MenuButton as={Button} aria-label="Categorías" _hover={{ bg: "#ffd700" }}>
+          Categorias
+        </MenuButton>
+        <MenuList>
+          {categories.map((item) => (
+            <MenuItem key={item.slug} onClick={() => navigate(`/category/${item.slug}`)}>
+              {item.name}
+            </MenuItem>
+          ))}
+        </MenuList>
+      </Menu>
+      <CartWidget />
     </Flex>
+  );
 }
-
 export default NavBar;
